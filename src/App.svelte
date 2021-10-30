@@ -1,15 +1,63 @@
-<script>
-  import localForage from "localforage";
+<script context="module" lang="ts">
+  export interface AppContextProps {
+    duplicateSetting(i: number): void;
+    updateSpecificSettings(
+      i: number,
+      settings: BotSettingsProps,
+    ): void;
+  }
+</script>
 
-  export let name;
+<script lang="ts">
+  import { setContext } from "svelte";
+
+  import BotSetting, {
+    base_settings,
+    BotSettingsProps,
+  } from "./components/BotSetting.svelte";
+  import { generateFinalCommand } from "./utils/generateFinalCommand.svelte";
+
+  export let name: string;
+
+  let resultTextFieldValue;
+
+  let allSettings: Array<BotSettingsProps> = [base_settings];
+
+  /**
+   * Duplicate settings and add insert into next slot in array
+   */
+  function duplicateSetting(i: number) {
+    console.log("i", i);
+    const dupe = JSON.parse(JSON.stringify(allSettings[i]));
+    allSettings.splice(i, 0, dupe);
+    allSettings = allSettings;
+  }
+
+  /**
+   * Update the main list of settings
+   */
+  function updateSpecificSettings(
+    i: number,
+    settings: BotSettingsProps,
+  ) {
+    allSettings[i] = settings;
+    allSettings = allSettings;
+  }
+
+  const appContext = {
+    duplicateSetting,
+    updateSpecificSettings,
+  };
+
+  function outputFinalCommand() {
+    const command = generateFinalCommand(allSettings);
+    resultTextFieldValue = command;
+  }
+
+  setContext<AppContextProps>("appContext", appContext);
 </script>
 
 <svelte:head>
-  <!-- Material Icons -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  />
   <!-- Roboto -->
   <link
     rel="stylesheet"
@@ -19,10 +67,6 @@
   <link
     rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto+Mono"
-  />
-  <link
-    rel="stylesheet"
-    href="./node_modules/svelte-material-ui/bare.css"
   />
 </svelte:head>
 
@@ -45,26 +89,34 @@
       <li>BUSD</li>
     </ul>
   </div>
-
   <div class="date">CALENDAR PICKER START/END DATE</div>
 
-  <!-- Multiple of these. -->
-  <div class="bot-settings">
-    <span>TP: 3</span>
-    <span>BO: 10</span>
-    <span>SO: 10</span>
-    <span>MSTC: 10</span>
-    <span>SOS: 10</span>
-    <span>OS: 10</span>
-    <span>SS: 10</span>
-    <span>FEES: 0.75</span>
-  </div>
+  <h3>Settings:</h3>
 
+  {#each allSettings as settings, i}
+    <BotSetting {settings} index={i} />
+  {/each}
+
+  <button on:click={outputFinalCommand}>Generate</button>
   <div class="result-command">
     <label for="result">Final Command</label>
-    <textarea name="result" id="result" cols="30" rows="10" />
+    <textarea
+      bind:value={resultTextFieldValue}
+      name="result"
+      id="result"
+      cols="30"
+      rows="10"
+    />
   </div>
 </main>
 
 <style>
+  main {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  #result {
+    width: 100%;
+  }
 </style>
