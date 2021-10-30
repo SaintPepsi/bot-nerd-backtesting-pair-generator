@@ -7,12 +7,14 @@
 
   export function generateFinalCommand(
     all_settings: Array<BotSettingsProps>,
+    startDate: string,
+    endDate: string,
+    basePairs: Array<string>,
+    quotePair: string,
   ) {
-    const pair = "ETH/BTC";
-    const startDate = "28/10/2020";
-    const endDate = "27/10/2021";
+    const pairs = generatePairs(basePairs, quotePair);
 
-    let finalCommand = `!dcabacktest -pair ${pair} `;
+    let finalCommand = `!dcabacktest -pair ${pairs} `;
 
     for (let i = 0; i < totalSettingProps; i++) {
       finalCommand += `-${settingsKeys[i]} `;
@@ -34,5 +36,19 @@
 
     console.log("finalCommand", finalCommand);
     return finalCommand;
+  }
+
+  function generatePairs(
+    basePairs: Array<string>,
+    quotePair: string,
+  ) {
+    let allPairs = "";
+    basePairs.forEach((pair, i) => {
+      allPairs += `${pair}/${quotePair}`;
+      if (i < basePairs.length - 1) {
+        allPairs += ", ";
+      }
+    });
+    return allPairs;
   }
 </script>

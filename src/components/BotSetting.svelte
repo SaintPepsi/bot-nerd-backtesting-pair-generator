@@ -65,7 +65,7 @@
     {/each}
   </div>
 
-  <!-- TODO: delete -->
+  <!-- Duplicate current settings -->
   <Button
     on:click={() => {
       duplicateSetting(index);
@@ -74,7 +74,7 @@
     <Icon icon={mdiContentCopy} />
   </Button>
 
-  <!-- Duplicate current settings -->
+  <!-- TODO: delete -->
   <Button
     on:click={() => {
       deleteSpecificSettings(index);
@@ -92,7 +92,7 @@
 
     :global(.button) {
       align-self: stretch;
-      margin-right: 16px;
+      margin-right: 8px;
     }
     :global(.button:last-child) {
       margin-right: 0;
@@ -102,7 +102,10 @@
   .bot-settings {
     display: grid;
     grid-template-columns: repeat(var(--total-settings), 1fr);
-    gap: 16px;
-    margin-right: 16px;
+    gap: 8px;
+    margin-right: 8px;
+    @media screen and (max-width: 767px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 </style>

@@ -5,25 +5,48 @@
       i: number,
       settings: BotSettingsProps,
     ): void;
+    updateSpecificPair(i: number, value: string): void;
     deleteSpecificSettings(i: number): void;
+    deleteSpecificPair(i: number): void;
   }
 </script>
 
 <script lang="ts">
+  import dayjs from "dayjs";
+  import { Datepicker } from "svelte-calendar";
   import { setContext } from "svelte";
+  import { mdiFileCodeOutline } from "@mdi/js";
+  import { mdiPlusThick } from "@mdi/js";
+  import { mdiContentCopy } from "@mdi/js";
 
   import BotSetting, {
     base_settings,
     BotSettingsProps,
   } from "./components/BotSetting.svelte";
   import { generateFinalCommand } from "./utils/generateFinalCommand.svelte";
+  import { calendarTheme } from "./data/calendarTheme.svelte";
+  import Button from "./components/Button.svelte";
+  import Icon from "./components/Icon.svelte";
+  import BasePair from "./components/BasePair.svelte";
+  import { uppercase } from "./actions/uppercase.svelte";
 
   export let name: string;
 
   let resultTextFieldValue: string;
 
   let allSettings: Array<BotSettingsProps> = [base_settings];
+  let allBasePairs: Array<string> = ["BTC"];
+  let quotePair = "USD";
 
+  let dateStoreStartDate: any;
+  let dateStoreEndDate: any;
+
+  $: startDate = dayjs($dateStoreStartDate?.selected).format(
+    "MM/DD/YYYY",
+  );
+  $: endDate = dayjs($dateStoreEndDate?.selected).format(
+    "MM/DD/YYYY",
+  );
   /**
    * Duplicate settings and add insert into next slot in array
    */
@@ -33,40 +56,62 @@
     const dupe = JSON.parse(JSON.stringify(allSettings[i]));
     allSettings.splice(i, 0, dupe);
     allSettings = allSettings;
-    console.log("duplicateSetting allSettings", allSettings);
   }
 
+  // Delete Functions
   function deleteSpecificSettings(i: number) {
     if (allSettings.length <= 1) return;
     allSettings.splice(i, 1);
     allSettings = allSettings;
-    console.log("deleteSpecificSettings allSettings", allSettings);
   }
 
-  /**
-   * Update the main list of settings
-   */
+  function deleteSpecificPair(i: number) {
+    if (allBasePairs.length <= 1) return;
+    allBasePairs.splice(i, 1);
+    allBasePairs = allBasePairs;
+  }
+
+  // Update functions
   function updateSpecificSettings(
     i: number,
     settings: BotSettingsProps,
   ) {
     allSettings[i] = settings;
     allSettings = allSettings;
-    console.log("updateSpecificSettings allSettings", allSettings);
+  }
+
+  function addNewPair() {
+    allBasePairs = [...allBasePairs, "BTC"];
+  }
+
+  function updateSpecificPair(i: number, value: string) {
+    allBasePairs[i] = value;
+    allBasePairs = allBasePairs;
+    console.log("allBasePairs", allBasePairs);
   }
 
   const appContext = {
     duplicateSetting,
     updateSpecificSettings,
     deleteSpecificSettings,
+    deleteSpecificPair,
+    updateSpecificPair,
   };
 
   function outputFinalCommand() {
-    const command = generateFinalCommand(allSettings);
+    const command = generateFinalCommand(
+      allSettings,
+      startDate,
+      endDate,
+      allBasePairs,
+      quotePair,
+    );
     resultTextFieldValue = command;
   }
 
   setContext<AppContextProps>("appContext", appContext);
+
+  let powercommandTextArea;
 </script>
 
 <svelte:head>
@@ -83,52 +128,176 @@
 </svelte:head>
 
 <main>
-  <h1>Hello {name}! Bot Tester</h1>
-
-  <div class="base-pair">
-    <p>Base pair</p>
-    <ul>
-      <li>BTC</li>
-      <li>ETH</li>
-      <li>SOL</li>
-    </ul>
+  <div class="section">
+    <h2>How to use:</h2>
+    <h3>1. Add Base Pairs</h3>
+    <h3>2. Change Quote Pair</h3>
+    <h3>3. Select Start / End Date</h3>
+    <h3>4. Add / Remove Settings</h3>
+    <h3>4. Generate Backtest Command</h3>
   </div>
 
-  <div class="quote-pair">
-    <p>Quote pair</p>
-    <ul>
-      <li>USDT</li>
-      <li>BUSD</li>
-    </ul>
+  <div class="base-pair-wrapper section">
+    <p>Base pairs</p>
+
+    <div class="pair-wrapper">
+      {#each allBasePairs as basePair, i}
+        <BasePair pair={basePair} index={i} />
+      {/each}
+      <!-- Add -->
+      <Button
+        on:click={() => {
+          addNewPair();
+        }}
+      >
+        <Icon icon={mdiPlusThick} />
+      </Button>
+    </div>
   </div>
-  <div class="date">CALENDAR PICKER START/END DATE</div>
+  <div class="section">
+    <div class="quote-pair">
+      <p>Quote pair</p>
 
-  <h3>Settings:</h3>
+      <input type="text" bind:value={quotePair} use:uppercase />
+    </div>
+  </div>
 
-  {#each allSettings as settings, i}
-    <BotSetting {settings} index={i} />
-  {/each}
+  <div class="date-pickers section">
+    <div class="date-wrapper">
+      <h3>Start Date</h3>
+      <Datepicker
+        bind:store={dateStoreStartDate}
+        theme={calendarTheme}
+      />
+    </div>
+    <div class="date-wrapper">
+      <h3>End Date</h3>
+      <Datepicker
+        bind:store={dateStoreEndDate}
+        theme={calendarTheme}
+      />
+    </div>
+  </div>
 
-  <button on:click={outputFinalCommand}>Generate</button>
-  <div class="result-command">
-    <label for="result">Final Command</label>
-    <textarea
-      bind:value={resultTextFieldValue}
-      name="result"
-      id="result"
-      cols="30"
-      rows="10"
-    />
+  <div class="section">
+    <h3>Settings:</h3>
+
+    {#each allSettings as settings, i}
+      <BotSetting {settings} index={i} />
+    {/each}
+  </div>
+
+  <div class="section">
+    <div class="result-command">
+      <label for="result">Final Command</label>
+      <textarea
+        bind:value={resultTextFieldValue}
+        bind:this={powercommandTextArea}
+        name="result"
+        id="result"
+        class="commmand-textarea"
+        rows="5"
+      />
+    </div>
+
+    <Button on:click={outputFinalCommand}>
+      <Icon icon={mdiFileCodeOutline} slot="icon" />
+      Generate
+    </Button>
+
+    <Button
+      on:click={() => {
+        navigator.clipboard
+          .writeText(resultTextFieldValue)
+          .then(() => {
+            // Success!
+          })
+          .catch((err) => {
+            console.log("Something went wrong", err);
+          });
+      }}
+    >
+      <Icon icon={mdiContentCopy} slot="icon" />
+      Copy power command
+    </Button>
   </div>
 </main>
 
-<style>
+<style lang="scss">
+  @import "./styles/button";
   main {
     width: 100%;
     max-width: 960px;
     margin: 0 auto;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
   #result {
     width: 100%;
+  }
+
+  .pair-wrapper {
+    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    @media screen and (max-width: 1000px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media screen and (max-width: 767px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media screen and (max-width: 500px) {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  .quote-pair {
+    @media screen and (max-width: 767px) {
+      input {
+        width: 100%;
+      }
+    }
+  }
+  .section {
+    margin-bottom: 32px;
+  }
+  .date-pickers {
+    display: flex;
+    justify-content: space-evenly;
+    @media screen and (max-width: 767px) {
+      display: block;
+      .date-wrapper {
+        &:last-child {
+          margin-top: 24px;
+        }
+        :global(.trigger) {
+          width: calc(100vw - 16px);
+        }
+      }
+    }
+
+    .date-wrapper {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      h3 {
+        margin-bottom: 16px;
+      }
+      :global(.sc-popover .trigger) {
+        @extend .base-button;
+      }
+      :global(.sc-popover .trigger:hover) {
+        @extend .base-button-hover;
+      }
+      :global(.sc-popover .trigger .button-container button) {
+        box-shadow: none;
+        background-color: transparent;
+      }
+    }
+  }
+
+  :global(.sc-popover .contents-wrapper) {
+    overflow: visible !important;
   }
 </style>

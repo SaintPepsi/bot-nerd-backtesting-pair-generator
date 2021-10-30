@@ -2,41 +2,23 @@
 </script>
 
 <div class="button" on:click>
+  {#if $$slots.icon}
+    <div class="icon-slot">
+      <slot name="icon" />
+    </div>
+  {/if}
   <slot />
 </div>
 
 <style type="text/scss">
+  @import "../styles/button";
   .button {
-    display: inline-flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    position: relative;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    background-color: transparent;
-    outline: 0 px;
-    margin: 0 px;
-    cursor: pointer;
-    user-select: none;
-    vertical-align: middle;
-    appearance: none;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.875rem;
-    line-height: 1.75;
-    letter-spacing: 0.02857em;
-    text-transform: uppercase;
-    min-width: 64px;
-    padding: 5px 15px;
-    border-radius: 4px;
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1)
-        0ms,
-      box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-      border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-      color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    border: 1px solid rgba(25, 118, 210, 0.5);
-    color: rgb(25, 118, 210);
+    @extend .base-button;
+    .icon-slot {
+      margin-left: -8px;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+    }
   }
 </style>
