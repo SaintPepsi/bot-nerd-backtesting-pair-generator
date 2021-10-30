@@ -65,7 +65,7 @@
   let dateStoreStartDate: any;
   let dateStoreEndDate: any;
 
-  let stopLossEnabled = true;
+  let stopLossEnabled = false;
   localforage.getItem("stopLossEnabled").then((value: boolean) => {
     stopLossEnabled = value;
   });
