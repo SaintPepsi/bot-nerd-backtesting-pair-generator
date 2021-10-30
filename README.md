@@ -11,11 +11,9 @@ Use the tool: [Backtester Power Command generator](https://romantic-austin-6f651
 5. Generate Backtest Command
    _Automatically saves current settings to local storage_
 
-Coffee is my fuel unit:
-<a href="https://www.buymeacoffee.com/SanCoca" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
 ---
 
-### Icons:
+Coffee is my fuel unit:
 
-[materialdesignicons.com](https://materialdesignicons.com/)
+<a href="https://www.buymeacoffee.com/SanCoca" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
