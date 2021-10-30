@@ -2,6 +2,9 @@
   export interface BotSettingsProps {
     [key: string]: number;
   }
+  export interface BotSettingsInfoProps {
+    [key: string]: string;
+  }
   // Base Settings
   export const base_settings: BotSettingsProps = {
     tp: 1,
@@ -9,17 +12,26 @@
     so: 10,
     mstc: 5,
     sos: 1,
+    os: 1,
     ss: 1,
+    sl: 1,
     fees: 0.075,
   };
+
+  export const base_settings_info: BotSettingsInfoProps = {
+    tp: "Take Profit",
+    bo: "Buy Order",
+    so: "Safety Order",
+    mstc: "Max Safety Trade Count",
+    sos: "Safety Order Size",
+    os: "Order Scale",
+    ss: "Safety Scale",
+    sl: "Stop Loss",
+    fees: "Fees percentage per trade",
+  };
+
   export const settingsKeys = Object.keys(base_settings);
   export const totalSettingProps = settingsKeys.length;
-
-  let root = document.documentElement;
-  root.style.setProperty(
-    "--total-settings",
-    totalSettingProps.toString(),
-  );
 
   export type UpdateSettingsProps = (
     key: string,
@@ -39,6 +51,7 @@
   import Input from "./Input.svelte";
 
   export let settings: BotSettingsProps = {};
+  export let stopLossEnabled = false;
 
   export let index: number;
   const {
@@ -54,14 +67,31 @@
   }
 
   setContext<UpdateSettingsProps>("updateSettings", updateSettings);
+
+  $: filteredSettings = Object.entries(settings).filter(
+    ([key, value]) => {
+      if (key !== "sl") {
+        return true;
+      } else {
+        if (stopLossEnabled) {
+          return true;
+        }
+      }
+      return false;
+    },
+  );
 </script>
 
 <!-- Multiple of these. -->
 <div class="settings-wrapper">
   <!-- Drag to rearrange -->
   <div class="bot-settings">
-    {#each Object.entries(settings) as [key, value]}
-      <Input setting={key} {value} />
+    {#each filteredSettings as [key, value]}
+      <Input
+        setting={key}
+        {value}
+        alternativeHoverText={base_settings_info[key]}
+      />
     {/each}
   </div>
 
@@ -100,8 +130,7 @@
     margin-bottom: 16px;
   }
   .bot-settings {
-    display: grid;
-    grid-template-columns: repeat(var(--total-settings), 1fr);
+    display: flex;
     gap: 8px;
     margin-right: 8px;
     @media screen and (max-width: 767px) {

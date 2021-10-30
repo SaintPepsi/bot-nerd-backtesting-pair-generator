@@ -19,6 +19,9 @@
   import { mdiPlusThick } from "@mdi/js";
   import { mdiContentCopy } from "@mdi/js";
   import { mdiGithub } from "@mdi/js";
+  import { mdiCheckboxMarked } from "@mdi/js";
+  import { mdiCheckboxBlankOutline } from "@mdi/js";
+
   import localforage from "localforage";
 
   import BotSetting, {
@@ -56,6 +59,11 @@
 
   let dateStoreStartDate: any;
   let dateStoreEndDate: any;
+
+  let stopLossEnabled = true;
+  localforage.getItem("stopLossEnabled").then((value: boolean) => {
+    stopLossEnabled = value;
+  });
 
   $: startDate = dayjs($dateStoreStartDate?.selected).format(
     "MM/DD/YYYY",
@@ -103,7 +111,7 @@
   }
 
   function addNewPair() {
-    allBasePairs = [...allBasePairs, "BTC"];
+    allBasePairs = [...allBasePairs, ""];
     setStorageEntry("allBasePairs", allBasePairs);
   }
 
@@ -128,6 +136,7 @@
       endDate,
       allBasePairs,
       quotePair,
+      stopLossEnabled,
     );
     resultTextFieldValue = command;
   }
@@ -206,10 +215,26 @@
   </div>
 
   <div class="section">
-    <h3>Settings:</h3>
+    <div class="vetical-flex-space">
+      <h3>Settings:</h3>
 
+      <Button
+        on:click={() => {
+          stopLossEnabled = !stopLossEnabled;
+          setStorageEntry("stopLossEnabled", stopLossEnabled);
+        }}
+      >
+        <Icon
+          icon={stopLossEnabled
+            ? mdiCheckboxMarked
+            : mdiCheckboxBlankOutline}
+          slot="icon"
+        />
+        Stop Loss
+      </Button>
+    </div>
     {#each allSettings as settings, i}
-      <BotSetting {settings} index={i} />
+      <BotSetting {settings} {stopLossEnabled} index={i} />
     {/each}
   </div>
 
@@ -294,7 +319,13 @@
       display: block;
     }
   }
-
+  .vetical-flex-space {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
   .pair-wrapper {
     display: flex;
     display: grid;
