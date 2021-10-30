@@ -18,6 +18,7 @@
   import { mdiFileCodeOutline } from "@mdi/js";
   import { mdiPlusThick } from "@mdi/js";
   import { mdiContentCopy } from "@mdi/js";
+  import localforage from "localforage";
 
   import BotSetting, {
     base_settings,
@@ -29,14 +30,28 @@
   import Icon from "./components/Icon.svelte";
   import BasePair from "./components/BasePair.svelte";
   import { uppercase } from "./actions/uppercase.svelte";
+  import { setStorageEntry } from "./utils/StorageManager.svelte";
 
   export let name: string;
 
   let resultTextFieldValue: string;
 
   let allSettings: Array<BotSettingsProps> = [base_settings];
+  localforage
+    .getItem("allSettings")
+    .then((value: Array<BotSettingsProps>) => {
+      allSettings = value;
+    });
+
   let allBasePairs: Array<string> = ["BTC"];
+  localforage.getItem("allBasePairs").then((value: Array<string>) => {
+    allBasePairs = value;
+  });
+
   let quotePair = "USD";
+  localforage.getItem("quotePair").then((value: string) => {
+    quotePair = value;
+  });
 
   let dateStoreStartDate: any;
   let dateStoreEndDate: any;
@@ -47,6 +62,8 @@
   $: endDate = dayjs($dateStoreEndDate?.selected).format(
     "MM/DD/YYYY",
   );
+
+  $: setStorageEntry("quotePair", quotePair);
   /**
    * Duplicate settings and add insert into next slot in array
    */
@@ -56,6 +73,7 @@
     const dupe = JSON.parse(JSON.stringify(allSettings[i]));
     allSettings.splice(i, 0, dupe);
     allSettings = allSettings;
+    setStorageEntry("allSettings", allSettings);
   }
 
   // Delete Functions
@@ -63,12 +81,14 @@
     if (allSettings.length <= 1) return;
     allSettings.splice(i, 1);
     allSettings = allSettings;
+    setStorageEntry("allSettings", allSettings);
   }
 
   function deleteSpecificPair(i: number) {
     if (allBasePairs.length <= 1) return;
     allBasePairs.splice(i, 1);
     allBasePairs = allBasePairs;
+    setStorageEntry("allBasePairs", allBasePairs);
   }
 
   // Update functions
@@ -78,16 +98,18 @@
   ) {
     allSettings[i] = settings;
     allSettings = allSettings;
+    setStorageEntry("allSettings", allSettings);
   }
 
   function addNewPair() {
     allBasePairs = [...allBasePairs, "BTC"];
+    setStorageEntry("allBasePairs", allBasePairs);
   }
 
   function updateSpecificPair(i: number, value: string) {
     allBasePairs[i] = value;
     allBasePairs = allBasePairs;
-    console.log("allBasePairs", allBasePairs);
+    setStorageEntry("allBasePairs", allBasePairs);
   }
 
   const appContext = {
@@ -135,6 +157,9 @@
     <h3>3. Select Start / End Date</h3>
     <h3>4. Add / Remove Settings</h3>
     <h3>4. Generate Backtest Command</h3>
+    <small
+      >*Automatically saves current settings to local storage</small
+    >
   </div>
 
   <div class="base-pair-wrapper section">
