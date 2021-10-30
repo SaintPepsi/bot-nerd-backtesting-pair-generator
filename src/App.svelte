@@ -44,7 +44,12 @@
   localforage
     .getItem("allSettings")
     .then((value: Array<BotSettingsProps>) => {
-      allSettings = value;
+      if (
+        Object.keys(allSettings[0].length) ===
+        Object.keys(value[0].length)
+      ) {
+        allSettings = value;
+      }
     });
 
   let allBasePairs: Array<string> = ["BTC"];
