@@ -18,6 +18,7 @@
   import { mdiFileCodeOutline } from "@mdi/js";
   import { mdiPlusThick } from "@mdi/js";
   import { mdiContentCopy } from "@mdi/js";
+  import { mdiGithub } from "@mdi/js";
   import localforage from "localforage";
 
   import BotSetting, {
@@ -25,7 +26,7 @@
     BotSettingsProps,
   } from "./components/BotSetting.svelte";
   import { generateFinalCommand } from "./utils/generateFinalCommand.svelte";
-  import { calendarTheme } from "./data/calendarTheme.svelte";
+  import { calendarTheme } from "./data/calendarTheme";
   import Button from "./components/Button.svelte";
   import Icon from "./components/Icon.svelte";
   import BasePair from "./components/BasePair.svelte";
@@ -246,6 +247,31 @@
       Copy power command
     </Button>
   </div>
+
+  <div class="section">
+    <a href="https://www.buymeacoffee.com/SanCoca" target="_blank"
+      ><img
+        src="https://cdn.buymeacoffee.com/buttons/default-yellow.png"
+        alt="Buy Me A Coffee"
+        height="41"
+        width="174"
+      /></a
+    >
+  </div>
+
+  <div class="section bug-report">
+    <h3>Bug?</h3>
+    <small>@SanCoca#4418 on discord - catch me on [bot nerds]</small>
+    <a
+      href="https://github.com/SaintPepsi/bot-nerd-backtesting-pair-generator"
+      target="_blank"
+    >
+      <Button>
+        <Icon icon={mdiGithub} slot="icon" />
+        View on github
+      </Button>
+    </a>
+  </div>
 </main>
 
 <style lang="scss">
@@ -259,6 +285,14 @@
   }
   #result {
     width: 100%;
+  }
+
+  .bug-report {
+    small,
+    a {
+      margin-top: 8px;
+      display: block;
+    }
   }
 
   .pair-wrapper {
