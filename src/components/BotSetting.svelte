@@ -29,6 +29,7 @@
 
 <script lang="ts">
   import { mdiContentCopy } from "@mdi/js";
+  import { mdiDelete } from "@mdi/js";
 
   import { getContext, setContext } from "svelte";
   import type { AppContextProps } from "../App.svelte";
@@ -37,10 +38,14 @@
 
   import Input from "./Input.svelte";
 
-  export let settings = {};
+  export let settings: BotSettingsProps = {};
+
   export let index: number;
-  const { duplicateSetting, updateSpecificSettings } =
-    getContext<AppContextProps>("appContext");
+  const {
+    duplicateSetting,
+    updateSpecificSettings,
+    deleteSpecificSettings,
+  } = getContext<AppContextProps>("appContext");
 
   function updateSettings(key: string, value: number) {
     settings[key] = value;
@@ -55,11 +60,12 @@
 <div class="settings-wrapper">
   <!-- Drag to rearrange -->
   <div class="bot-settings">
-    {#each Object.entries(base_settings) as [key, value]}
+    {#each Object.entries(settings) as [key, value]}
       <Input setting={key} {value} />
     {/each}
   </div>
-  <!-- Duplicate current settings -->
+
+  <!-- TODO: delete -->
   <Button
     on:click={() => {
       duplicateSetting(index);
@@ -68,7 +74,14 @@
     <Icon icon={mdiContentCopy} />
   </Button>
 
-  <!-- TODO: delete -->
+  <!-- Duplicate current settings -->
+  <Button
+    on:click={() => {
+      deleteSpecificSettings(index);
+    }}
+  >
+    <Icon icon={mdiDelete} />
+  </Button>
 </div>
 
 <style type="text/scss">
@@ -79,6 +92,10 @@
 
     :global(.button) {
       align-self: stretch;
+      margin-right: 16px;
+    }
+    :global(.button:last-child) {
+      margin-right: 0;
     }
     margin-bottom: 16px;
   }

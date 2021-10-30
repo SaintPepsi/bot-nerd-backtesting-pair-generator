@@ -5,6 +5,7 @@
       i: number,
       settings: BotSettingsProps,
     ): void;
+    deleteSpecificSettings(i: number): void;
   }
 </script>
 
@@ -19,7 +20,7 @@
 
   export let name: string;
 
-  let resultTextFieldValue;
+  let resultTextFieldValue: string;
 
   let allSettings: Array<BotSettingsProps> = [base_settings];
 
@@ -28,9 +29,18 @@
    */
   function duplicateSetting(i: number) {
     console.log("i", i);
+    console.log("allSettings[i]", allSettings[i]);
     const dupe = JSON.parse(JSON.stringify(allSettings[i]));
     allSettings.splice(i, 0, dupe);
     allSettings = allSettings;
+    console.log("duplicateSetting allSettings", allSettings);
+  }
+
+  function deleteSpecificSettings(i: number) {
+    if (allSettings.length <= 1) return;
+    allSettings.splice(i, 1);
+    allSettings = allSettings;
+    console.log("deleteSpecificSettings allSettings", allSettings);
   }
 
   /**
@@ -42,11 +52,13 @@
   ) {
     allSettings[i] = settings;
     allSettings = allSettings;
+    console.log("updateSpecificSettings allSettings", allSettings);
   }
 
   const appContext = {
     duplicateSetting,
     updateSpecificSettings,
+    deleteSpecificSettings,
   };
 
   function outputFinalCommand() {
