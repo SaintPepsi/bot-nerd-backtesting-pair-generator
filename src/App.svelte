@@ -71,10 +71,10 @@
   });
 
   $: startDate = dayjs($dateStoreStartDate?.selected).format(
-    "MM/DD/YYYY",
+    "DD/MM/YYYY",
   );
   $: endDate = dayjs($dateStoreEndDate?.selected).format(
-    "MM/DD/YYYY",
+    "DD/MM/YYYY",
   );
 
   $: setStorageEntry("quotePair", quotePair);
