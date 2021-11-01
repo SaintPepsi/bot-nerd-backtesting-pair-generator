@@ -45,8 +45,8 @@
     .getItem("allSettings")
     .then((value: Array<BotSettingsProps>) => {
       if (
-        Object.keys(allSettings[0].length) ===
-        Object.keys(value[0].length)
+        Object.keys(allSettings[0]).length ===
+        Object.keys(value[0]).length
       ) {
         allSettings = value;
       }
