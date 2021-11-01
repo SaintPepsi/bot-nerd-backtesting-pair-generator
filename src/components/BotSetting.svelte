@@ -86,7 +86,7 @@
 <div class="settings-wrapper">
   <!-- Drag to rearrange -->
   <div class="bot-settings">
-    {#each filteredSettings as [key, value]}
+    {#each filteredSettings as [key, value], i}
       <Input
         setting={key}
         {value}
@@ -128,12 +128,20 @@
       margin-right: 0;
     }
     margin-bottom: 16px;
+    margin-top: 16px;
   }
   .bot-settings {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(
+      var(--total-settings-displayed),
+      1fr
+    );
     gap: 8px;
     margin-right: 8px;
     @media screen and (max-width: 767px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @media screen and (max-width: 500px) {
       grid-template-columns: repeat(3, 1fr);
     }
   }

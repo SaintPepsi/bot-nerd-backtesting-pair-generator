@@ -35,6 +35,7 @@
   import BasePair from "./components/BasePair.svelte";
   import { uppercase } from "./actions/uppercase.svelte";
   import { setStorageEntry } from "./utils/StorageManager.svelte";
+  import { setTotalSettingsDisplayed } from "./utils/setTotalSettingsDisplayed.svelte";
 
   export let name: string;
 
@@ -71,6 +72,8 @@
   localforage.getItem("stopLossEnabled").then((value: boolean) => {
     stopLossEnabled = value;
   });
+
+  $: setTotalSettingsDisplayed(stopLossEnabled);
 
   // Default Start Date
   let storedStartDate = new Date(
@@ -253,6 +256,9 @@
     </div>
     {#each allSettings as settings, i}
       <BotSetting {settings} {stopLossEnabled} index={i} />
+      {#if i < allSettings.length - 1}
+        <hr />
+      {/if}
     {/each}
   </div>
 
