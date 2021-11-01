@@ -45,8 +45,9 @@
     .getItem("allSettings")
     .then((value: Array<BotSettingsProps>) => {
       if (
+        value &&
         Object.keys(allSettings[0]).length ===
-        Object.keys(value[0]).length
+          Object.keys(value[0]).length
       ) {
         allSettings = value;
       }
@@ -54,6 +55,7 @@
 
   let allBasePairs: Array<string> = ["BTC"];
   localforage.getItem("allBasePairs").then((value: Array<string>) => {
+    if (!value) return;
     allBasePairs = value;
   });
 
@@ -70,6 +72,14 @@
     stopLossEnabled = value;
   });
 
+  // Default Start Date
+  let storedStartDate = new Date(
+    dayjs().subtract(1, "month").format(),
+  );
+
+  // Default End Date
+  let storedEndDate = new Date();
+
   $: startDate = dayjs($dateStoreStartDate?.selected).format(
     "DD/MM/YYYY",
   );
@@ -78,6 +88,7 @@
   );
 
   $: setStorageEntry("quotePair", quotePair);
+
   /**
    * Duplicate settings and add insert into next slot in array
    */
@@ -147,8 +158,6 @@
   }
 
   setContext<AppContextProps>("appContext", appContext);
-
-  let powercommandTextArea;
 </script>
 
 <svelte:head>
@@ -207,6 +216,8 @@
       <h3>Start Date</h3>
       <Datepicker
         bind:store={dateStoreStartDate}
+        selected={storedStartDate}
+        format={"DD/MM/YYYY"}
         theme={calendarTheme}
       />
     </div>
@@ -214,6 +225,8 @@
       <h3>End Date</h3>
       <Datepicker
         bind:store={dateStoreEndDate}
+        selected={storedEndDate}
+        format={"DD/MM/YYYY"}
         theme={calendarTheme}
       />
     </div>
@@ -248,7 +261,6 @@
       <label for="result">Final Command</label>
       <textarea
         bind:value={resultTextFieldValue}
-        bind:this={powercommandTextArea}
         name="result"
         id="result"
         class="commmand-textarea"
